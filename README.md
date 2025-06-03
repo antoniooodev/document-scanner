@@ -410,11 +410,6 @@ sudo apt-get install cmake
 # Verify OpenCV is using optimized builds
 ```
 
-## 📞 Contact and Support
-
-- **Course:** Computer Vision Final Project
-- **Institution:** [University of Padua]
-
 ### Getting Help
 
 1. Check the [Issues](https://github.com/antoniooodev/document-scanner/issues) page
