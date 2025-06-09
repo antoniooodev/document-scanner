@@ -19,7 +19,14 @@ cmake -DCMAKE_BUILD_TYPE=Release ..
 
 # Build project
 echo "Compiling..."
-make -j$(nproc)
+# Use different commands based on OS
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # macOS
+    make -j$(sysctl -n hw.ncpu)
+else
+    # Linux
+    make -j$(nproc)
+fi
 
 echo "Build complete! Executable: ./DocumentScanner"
 
