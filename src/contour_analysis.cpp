@@ -9,16 +9,18 @@ using cv::Point2f;
 double edgeMean(const std::vector<Point2f> &q, const Mat &eq)
 {
     Mat sob;
+    // Emphasizes gradient edges using Sobel
     cv::Sobel(eq, sob, CV_32F, 1, 1);
     double s = 0;
     int n = 0;
 
+    // Goes over all edge points and computes average edge strengh on quad's border
     for (int i = 0; i < 4; i++)
     {
         cv::LineIterator it(sob, q[i], q[(i + 1) & 3], 8);
         for (int j = 0; j < it.count; ++j, ++it)
         {
-            s += static_cast<double>((*it)[0]); // Remove abs since uchar is always positive
+            s += static_cast<double>((*it)[0]); // Uchar always positive
             ++n;
         }
     }
@@ -28,6 +30,7 @@ double edgeMean(const std::vector<Point2f> &q, const Mat &eq)
 double borderFrac(const std::vector<Point2f> &q, int W, int H)
 {
     double touch = 0, per = 0;
+    // If both endpoints of an edge are close to the border, add its length to the total
     for (int i = 0; i < 4; i++)
     {
         auto a = q[i], b = q[(i + 1) & 3];
@@ -39,6 +42,8 @@ double borderFrac(const std::vector<Point2f> &q, int W, int H)
             touch += len;
         }
     }
+
+    // Fraction of the quad's perimeter touching the img's border
     return touch / per;
 }
 
@@ -63,27 +68,37 @@ double whiteness(const std::vector<Point2f> &q, const Mat &gray)
 void evalQuad(std::vector<Point2f> q, std::vector<Cand> &list,
               double Aimg, int W, int H, const Mat &eq, const Mat &gray, double medGrad)
 {
+    // If the quad intersects itself, it's invalid
     if (crossSelf(q))
         return;
 
+    // If quad area < 2.9% of img area, it's invalid
     double A = fabs(cv::contourArea(q));
     if (A < 0.029 * Aimg)
         return;
 
+    // If more than 47.6% of quad's border touches the img border, it's invalid
     double bF = borderFrac(q, W, H);
     if (bF > 0.476)
         return;
 
+    // Compares aspect ratio of the quad to that of a normal A4 paper
     double areaFit = 1 - std::abs(A - 0.458 * Aimg) / (0.458 * Aimg);
 
     double ar = std::max(cv::norm(q[0] - q[1]), cv::norm(q[1] - q[2])) /
                 std::min(cv::norm(q[0] - q[1]), cv::norm(q[1] - q[2]));
     double ARfit = 1 - std::min(std::abs(ar - 1.414) / 1.0, 1.0);
 
+    // Comparison with median gradient in the img
     double gradFit = medGrad > 1 ? std::clamp(edgeMean(q, eq) / (edgeMean(q, eq) + medGrad), 0.0, 1.0) : 0.5;
+
+    // Computes whiteness of quad's content
     double wFit = whiteness(q, gray);
 
     // Optimized weights
+    // All scores are combined into a final eval
     double score = 0.329 * areaFit + 0.266 * wFit + 0.208 * gradFit + 0.197 * ARfit;
+
+    // Pushes quad into the candidates list if it wasn't discarded (with its score)
     list.push_back({q, score});
 }

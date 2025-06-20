@@ -27,7 +27,7 @@ std::vector<Point2f> detect(const Mat &img)
 
     std::vector<Cand> list;
 
-    // 1. Polygon approximation with 4 sides
+    // Polygon approximation with 4 sides
     for (auto &cont : C)
     {
         std::vector<cv::Point> ap;
@@ -40,7 +40,7 @@ std::vector<Point2f> detect(const Mat &img)
         }
     }
 
-    // 2. Minimum area rectangle for each contour
+    // Minimum area rectangle for each contour
     for (auto &cont : C)
     {
         cv::RotatedRect rr = cv::minAreaRect(cont);
