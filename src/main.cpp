@@ -6,6 +6,7 @@
 #include "document_transform.h"
 #include <opencv2/opencv.hpp>
 #include <filesystem>
+#include <fstream>
 #include <iostream>
 #include <chrono>
 
@@ -44,10 +45,16 @@ static double exec(const fs::path& imgP, const fs::path& gtP, const fs::path& co
     cv::Mat warped = fourPointTransform(src, orderedQuadFullRes);
 
     // Save prediction in current directory
-    fs::path predFile = imgP.filename();
-    predFile = predFile.stem().string() + "_predc.txt";
-    saveTxt(predFile, quad);
-    std::cout << "Saved predictions to: " << predFile << std::endl;
+    fs::path predFile = "predicted_corners.txt";
+    // Keep file in append mode to work in a loop
+    std::ofstream out(predFile, std::ios::app);
+
+    out << imgP.stem().string() << ": ";
+    for (int i = 0; i < 4; ++i) {
+        out << "\"" << (int)quad[i].x << " " << (int)quad[i].y << "\"   ";
+    }
+    out << "\n";
+
 
     // Handle ground truth
     std::vector<Point2f> gt;
@@ -121,6 +128,10 @@ static double exec(const fs::path& imgP, const fs::path& gtP, const fs::path& co
 
 // Main function - handles command line arguments and dataset processing.
 int main(int argc, char** argv) {
+    // Clear predictions file at the start (open in truncate mode)
+    std::ofstream clearPredFile("predicted_corners.txt", std::ios::trunc);
+    clearPredFile.close();
+
     if(argc < 2) {
         std::cout << "Usage: ./DocumentScanner img.png [gt.txt] | ./DocumentScanner --dataset DIR\n";
         return 0;
