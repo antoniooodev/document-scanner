@@ -1,6 +1,8 @@
 // src/document_transform.cpp
 #include "document_transform.h"
 
+using cv::Mat;
+using cv::Point2f;
 
 std::vector<cv::Point2f> orderPoints(const std::vector<cv::Point2f>& pts)
 {

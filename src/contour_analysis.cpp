@@ -3,6 +3,9 @@
 #include "geometry_utils.h"
 #include <cmath>
 
+using cv::Mat;
+using cv::Point2f;
+
 double edgeMean(const std::vector<Point2f> &q, const Mat &eq)
 {
     Mat sob;

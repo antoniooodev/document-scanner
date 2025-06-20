@@ -1,7 +1,11 @@
 #include "file_io.h"
 #include "geometry_utils.h"
+#include <opencv2/opencv.hpp>
 #include <fstream>
 #include <iostream>
+
+using cv::Point2f;
+using cv::Mat;
 
 void saveTxt(const fs::path& p, const std::vector<Point2f>& q) {
     std::ofstream f(p);

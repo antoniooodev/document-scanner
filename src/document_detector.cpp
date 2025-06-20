@@ -5,6 +5,9 @@
 #include "geometry_utils.h"
 #include <algorithm>
 
+using cv::Mat;
+using cv::Point2f;
+
 std::vector<Point2f> detect(const Mat &img)
 {
     int W = img.cols, H = img.rows;

@@ -1,6 +1,9 @@
 // src/visualization.cpp
 #include "visualization.h"
 
+using cv::Mat;
+using cv::Point2f;
+
 void drawBoxes(const Mat &img, const std::vector<Point2f> &detected,
                const std::vector<Point2f> &gt, const fs::path &outputPath)
 {

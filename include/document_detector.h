@@ -5,13 +5,8 @@
 #include <opencv2/opencv.hpp>
 #include <vector>
 
-using cv::Mat;
-using cv::Point2f;
-
-/**
- * Main document detection function.
- * Detects document corners in the input image.
- */
-std::vector<Point2f> detect(const Mat &img);
+// Main document detection function.
+// Detects document corners in the input image.
+std::vector<cv::Point2f> detect(const cv::Mat &img);
 
 #endif // DOCUMENT_DETECTOR_H_

@@ -15,8 +15,7 @@ using cv::Point2f;
 
 // Executes document detection on a single image.
 
-static double exec(const fs::path& imgP, const fs::path& gtP, const fs::path& jsonDir, 
-                   const fs::path& coordFile = "") {
+static double exec(const fs::path& imgP, const fs::path& gtP, const fs::path& coordFile = "") {
     std::cout << "Processing: " << imgP.filename() << std::endl;
 
     // Start timing
@@ -88,17 +87,6 @@ static double exec(const fs::path& imgP, const fs::path& gtP, const fs::path& js
         gt = {Point2f(0,0), Point2f(mini.cols-1,0), Point2f(mini.cols-1,mini.rows-1), Point2f(0,mini.rows-1)};
     }
 
-    // Save JSON results
-    fs::create_directories(jsonDir);
-    cv::FileStorage js((jsonDir / (imgP.stem().string() + ".json")).string(),
-                       cv::FileStorage::WRITE | cv::FileStorage::FORMAT_JSON);
-    js << "image" << imgP.filename().string() 
-       << "size" << "[" << mini.cols << mini.rows << "]"
-       << "quad" << quad 
-       << "gt_quad" << gt 
-       << "iou" << iou;
-    js.release();
-
     // Draw and save visualization
     fs::path outputDir = "output";
     fs::path outputPath = outputDir / (imgP.stem().string() + "_boxes.png");
@@ -106,7 +94,7 @@ static double exec(const fs::path& imgP, const fs::path& gtP, const fs::path& js
     std::cout << "Saved visualization to: " << outputPath << std::endl;
 
     // Save warped image (final scan)
-    fs::path outputPathWarp = outputDir / (imgP.stem().string() + "_warped.png");
+    fs::path outputPathWarp = outputDir / (imgP.stem().string() + "_scan.png");
     cv::imwrite(outputPathWarp, warped);
     std::cout << "Saved document to: " << outputPathWarp << std::endl;
 
@@ -140,7 +128,7 @@ int main(int argc, char** argv) {
     
     std::string a1 = argv[1];
     if(a1 == "--dataset") {
-        fs::path dir = argv[2], json = dir / "json";
+        fs::path dir = argv[2];
         fs::path coordFile = dir / "../ground_truth/coordinates.txt";
         double sum = 0;
         int n = 0;
@@ -154,7 +142,7 @@ int main(int argc, char** argv) {
             if(!fs::exists(img)) continue;
             
             try {
-                double i = exec(img, "", json, coordFile);
+                double i = exec(img, "", coordFile);
                 if(i >= 0) {
                     sum += i;
                     n++;
@@ -168,11 +156,10 @@ int main(int argc, char** argv) {
     } else {
         fs::path img = a1;
         fs::path gt = (argc > 2 ? fs::path(argv[2]) : fs::path());
-        fs::path jsonDir = "json";
         fs::path coordFile = "../data/ground_truth/coordinates.txt";
         
         try {
-            exec(img, gt, jsonDir, coordFile);
+            exec(img, gt, coordFile);
         } catch(const std::exception& e) {
             std::cerr << e.what() << "\n";
         }

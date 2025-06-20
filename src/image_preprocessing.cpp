@@ -3,6 +3,9 @@
 #include <vector>
 #include <algorithm>
 
+using cv::Mat;
+using cv::Point2f;
+
 double preprocessImage(const Mat &img, Mat &mag, Mat &eq)
 {
     // Convert to grayscale and apply CLAHE

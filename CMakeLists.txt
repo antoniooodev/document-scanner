@@ -7,12 +7,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Find OpenCV
 find_package(OpenCV REQUIRED)
 
-# Optional ximgproc module
-find_package(OpenCV COMPONENTS ximgproc QUIET)
-if(OpenCV_ximgproc_FOUND)
-    add_definitions(-DHAVE_OPENCV_XIMGPROC)
-endif()
-
 # Include directories
 include_directories(include)
 include_directories(${OpenCV_INCLUDE_DIRS})
@@ -35,9 +29,3 @@ add_executable(DocumentScanner ${SOURCES})
 
 # Link libraries
 target_link_libraries(DocumentScanner ${OpenCV_LIBS})
-
-# Enable testing
-#enable_testing()
-
-# Add tests subdirectory
-#add_subdirectory(tests)

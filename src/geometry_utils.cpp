@@ -2,6 +2,9 @@
 #include "geometry_utils.h"
 #include <algorithm>
 
+using cv::Mat;
+using cv::Point2f;
+
 void orderCCW(std::vector<Point2f> &q)
 {
     if (q.size() != 4)
@@ -43,18 +46,4 @@ void clipPt(Point2f &p, int W, int H)
 {
     p.x = std::clamp(p.x, 0.f, (float)(W - 1));
     p.y = std::clamp(p.y, 0.f, (float)(H - 1));
-}
-
-double averagePointDistance(const std::vector<cv::Point2f>& a, const std::vector<cv::Point2f>& b)
-{
-    if (a.size() != b.size()) throw std::invalid_argument("Point sets must have same size");
-    
-    double totalDist = 0.0;
-    for (size_t i = 0; i < a.size(); ++i) {
-        double dx = a[i].x - b[i].x;
-        double dy = a[i].y - b[i].y;
-        // Euclidean distance between the two points
-        totalDist += std::sqrt(dx*dx + dy*dy);
-    }
-    return totalDist / a.size();
 }
