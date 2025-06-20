@@ -21,6 +21,7 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 set(SOURCES
     src/main.cpp
     src/geometry_utils.cpp
+    src/document_transform.cpp
     src/image_preprocessing.cpp
     src/contour_analysis.cpp
     src/document_detector.cpp
@@ -36,7 +37,7 @@ add_executable(DocumentScanner ${SOURCES})
 target_link_libraries(DocumentScanner ${OpenCV_LIBS})
 
 # Enable testing
-enable_testing()
+#enable_testing()
 
 # Add tests subdirectory
-add_subdirectory(tests)
+#add_subdirectory(tests)

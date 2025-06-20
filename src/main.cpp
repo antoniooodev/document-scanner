@@ -3,20 +3,24 @@
 #include "evaluation.h"
 #include "visualization.h"
 #include "geometry_utils.h"
+#include "document_transform.h"
 #include <opencv2/opencv.hpp>
 #include <filesystem>
 #include <iostream>
+#include <chrono>
 
 namespace fs = std::filesystem;
 using cv::Mat;
 using cv::Point2f;
 
-/**
- * Executes document detection on a single image.
- */
+// Executes document detection on a single image.
+
 static double exec(const fs::path& imgP, const fs::path& gtP, const fs::path& jsonDir, 
                    const fs::path& coordFile = "") {
     std::cout << "Processing: " << imgP.filename() << std::endl;
+
+    // Start timing
+    auto start = std::chrono::high_resolution_clock::now();
     
     Mat src = cv::imread(imgP.string());
     if(src.empty()) throw std::runtime_error("imread failed");
@@ -28,6 +32,18 @@ static double exec(const fs::path& imgP, const fs::path& gtP, const fs::path& js
     auto quad = detect(mini);
     for(auto& p : quad) clipPt(p, mini.cols, mini.rows);
     
+    // Order points as top left, top right, bottom right, bottom left
+    auto orderedQuad = orderPoints(quad);
+
+    // Rescale up to original img size (using same factor sc)
+    std::vector<cv::Point2f> orderedQuadFullRes;
+    for (const auto& pt : orderedQuad) {
+        orderedQuadFullRes.emplace_back(pt.x / sc, pt.y / sc);
+    }
+
+    // Transform to get top down view
+    cv::Mat warped = fourPointTransform(src, orderedQuadFullRes);
+
     // Save prediction in current directory
     fs::path predFile = imgP.filename();
     predFile = predFile.stem().string() + "_predc.txt";
@@ -89,13 +105,33 @@ static double exec(const fs::path& imgP, const fs::path& gtP, const fs::path& js
     drawBoxes(mini, quad, gt, outputPath);
     std::cout << "Saved visualization to: " << outputPath << std::endl;
 
-    std::cout << '"' << imgP.filename().string() << "\": IoU=" << iou << '\n';
+    // Save warped image (final scan)
+    fs::path outputPathWarp = outputDir / (imgP.stem().string() + "_warped.png");
+    cv::imwrite(outputPathWarp, warped);
+    std::cout << "Saved document to: " << outputPathWarp << std::endl;
+
+    // Stop timing
+    auto end = std::chrono::high_resolution_clock::now();
+    // Compute and print duration in milliseconds
+    double duration_ms = std::chrono::duration<double, std::milli>(end - start).count();
+
+    std::cout << "--> Processing time: " << duration_ms << " ms\n";
+
+    // Compute average distance between corners
+    if (!gt.empty()) {
+        // Re-order ground truth vector clock wise (for correct corner corrispondence)
+        gt = orderPoints(gt);
+        double avgDist = averagePointDistance(quad, gt);
+        std::cout << "--> Average distance from ground truth: " << avgDist << " pixels\n";
+    }
+
+    // Print IoU
+    std::cout << "--> " << imgP.filename().string() << "\": IoU=" << iou << '\n';
+    std::cout << "\n";
     return iou;
 }
 
-/**
- * Main function - handles command line arguments and dataset processing.
- */
+// Main function - handles command line arguments and dataset processing.
 int main(int argc, char** argv) {
     if(argc < 2) {
         std::cout << "Usage: ./DocumentScanner img.png [gt.txt] | ./DocumentScanner --dataset DIR\n";

@@ -3,9 +3,6 @@
 #include "image_preprocessing.h"
 #include "contour_analysis.h"
 #include "geometry_utils.h"
-#ifdef HAVE_OPENCV_XIMGPROC
-#include <opencv2/ximgproc.hpp>
-#endif
 #include <algorithm>
 
 std::vector<Point2f> detect(const Mat &img)
@@ -50,41 +47,6 @@ std::vector<Point2f> detect(const Mat &img)
         orderCCW(q);
         evalQuad(q, list, Aimg, W, H, eq, gray, medGrad);
     }
-
-#ifdef HAVE_OPENCV_XIMGPROC
-    // 3. Line segment detection + RANSAC (optional)
-    {
-        Mat edges;
-        cv::Canny(eq, edges, 50, 150);
-        auto fld = cv::ximgproc::createFastLineDetector();
-        std::vector<cv::Vec4f> segs;
-        fld->detect(edges, segs);
-
-        if (segs.size() >= 4)
-        {
-            // Take 4 longest segments
-            std::sort(segs.begin(), segs.end(), [](auto &a, auto &b)
-                      {
-                double la = cv::norm(Point2f(a[0], a[1]) - Point2f(a[2], a[3]));
-                double lb = cv::norm(Point2f(b[0], b[1]) - Point2f(b[2], b[3]));
-                return la > lb; });
-
-            std::vector<Point2f> pts;
-            for (int i = 0; i < 4; i++)
-            {
-                pts.emplace_back(segs[i][0], segs[i][1]);
-                pts.emplace_back(segs[i][2], segs[i][3]);
-            }
-
-            cv::RotatedRect rr = cv::minAreaRect(pts);
-            Point2f r[4];
-            rr.points(r);
-            std::vector<Point2f> q(r, r + 4);
-            orderCCW(q);
-            evalQuad(q, list, Aimg, W, H, eq, gray, medGrad);
-        }
-    }
-#endif
 
     // Choose best score
     std::vector<Point2f> best;
