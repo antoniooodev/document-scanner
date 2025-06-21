@@ -4,6 +4,8 @@
 
 #include <opencv2/opencv.hpp>
 #include <vector>
+#include <algorithm>
+#include <cmath>
 
 namespace fs = std::filesystem;
 
@@ -18,5 +20,12 @@ bool crossSelf(const std::vector<cv::Point2f> &q);
 
 // Clips a point to be within image boundaries
 void clipPt(cv::Point2f &p, int W, int H);
+
+// Order rectangle points clock wise (tl, tr, br, bl)
+std::vector<cv::Point2f> orderPoints(const std::vector<cv::Point2f>& pts);
+
+// Four points warping to achieve final scan of the document
+cv::Mat fourPointTransform(const cv::Mat& image, const std::vector<cv::Point2f>& pts);
+
 
 #endif // GEOMETRY_UTILS_H_
