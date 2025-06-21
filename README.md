@@ -26,9 +26,6 @@ DocumentScanner/
 │   ├── file_io.cpp
 │   ├── evaluation.cpp
 │   └── visualization.cpp
-├── tests/                 # Unit tests
-│   ├── CMakeLists.txt
-│   └── test_document_scanner.cpp
 └── data/                  # Test data
     ├── input/
     ├── output/
@@ -42,23 +39,16 @@ DocumentScanner/
 - OpenCV 4.x
 - CMake 3.16+
 - C++17 compatible compiler
-- Optional: OpenCV ximgproc module for advanced line detection
 
 ### Build Instructions
 
 1. **Quick build:**
 
    ```bash
-   chmod +x build.sh
-   ./build.sh
-   ```
-
-2. **Manual build:**
-   ```bash
-   mkdir build && cd build
-   cmake -DCMAKE_BUILD_TYPE=Release ..
-   make -j$(nproc)
-   ```
+   mkdir build
+   cd build/
+   cmake ..
+   make
 
 ## Usage
 
@@ -79,27 +69,9 @@ Expected dataset structure:
 ```
 dataset/
 ├── img_1.png
-├── img_1_optc.txt
 ├── img_2.png
-├── img_2_optc.txt
 ...
 └── img_10.png
-```
-
-## Testing
-
-Run all tests:
-
-```bash
-chmod +x run_tests.sh
-./run_tests.sh
-```
-
-Or run tests manually:
-
-```bash
-cd build
-ctest --verbose
 ```
 
 ## Features
@@ -111,7 +83,6 @@ ctest --verbose
   - Optional line segment detection
 - **Quality Scoring**: Based on area, aspect ratio, edge strength, and document whiteness
 - **Visualization**: Outputs comparison images with detected vs ground truth boxes
-- **JSON Export**: Detailed results in JSON format
 
 ## Performance Metrics
 
