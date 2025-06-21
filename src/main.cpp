@@ -36,6 +36,7 @@ static double exec(const fs::path& imgP, const fs::path& gtP, const fs::path& co
     auto orderedQuad = orderPoints(quad);
 
     // Rescale up to original img size (using same factor sc)
+    // Higher resolution, downscaled scan is too blurred
     std::vector<cv::Point2f> orderedQuadFullRes;
     for (const auto& pt : orderedQuad) {
         orderedQuadFullRes.emplace_back(pt.x / sc, pt.y / sc);
@@ -43,18 +44,6 @@ static double exec(const fs::path& imgP, const fs::path& gtP, const fs::path& co
 
     // Transform to get top down view
     cv::Mat warped = fourPointTransform(src, orderedQuadFullRes);
-
-    // Save prediction in current directory
-    fs::path predFile = "predicted_corners.txt";
-    // Keep file in append mode to work in a loop
-    std::ofstream out(predFile, std::ios::app);
-
-    out << imgP.stem().string() << ": ";
-    for (int i = 0; i < 4; ++i) {
-        out << "\"" << (int)quad[i].x << " " << (int)quad[i].y << "\"   ";
-    }
-    out << "\n";
-
 
     // Handle ground truth
     std::vector<Point2f> gt;
@@ -112,6 +101,7 @@ static double exec(const fs::path& imgP, const fs::path& gtP, const fs::path& co
 
     std::cout << "--> Processing time: " << duration_ms << " ms\n";
 
+    double avgDist = -1;
     // Compute average distance between corners
     if (!gt.empty()) {
         // Re-order ground truth vector clock wise (for correct corner corrispondence)
@@ -123,13 +113,31 @@ static double exec(const fs::path& imgP, const fs::path& gtP, const fs::path& co
     // Print IoU
     std::cout << "--> " << imgP.filename().string() << "\": IoU=" << iou << '\n';
     std::cout << "\n";
+
+    // Save prediction in current directory
+    fs::path predFile = "complete_results.txt";
+    // Keep file in append mode to work in a loop
+    std::ofstream out(predFile, std::ios::app);
+
+    // Append all measurements for current file
+    out << imgP.stem().string() << ": ";
+    for (int i = 0; i < 4; ++i) {
+        out << "\"" << (int)quad[i].x << " " << (int)quad[i].y << "\"   ";
+    }
+    out << "\n";
+    out << "--> Processing time: " << duration_ms << " ms\n";
+    out << "--> Average distance from ground truth: " << avgDist << " pixels\n";
+    out << "--> " << imgP.filename().string() << "\": IoU=" << iou << '\n';
+    out << "\n";
+
+    // Return IoU (due to func definition)
     return iou;
 }
 
 // Main function - handles command line arguments and dataset processing.
 int main(int argc, char** argv) {
     // Clear predictions file at the start (open in truncate mode)
-    std::ofstream clearPredFile("predicted_corners.txt", std::ios::trunc);
+    std::ofstream clearPredFile("complete_results.txt", std::ios::trunc);
     clearPredFile.close();
 
     if(argc < 2) {
