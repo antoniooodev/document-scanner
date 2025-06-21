@@ -11,9 +11,6 @@ namespace fs = std::filesystem;
 
 // Utility functions for geometric operations
 
-// Orders four points in counter-clockwise order starting from top-left
-void orderCCW(std::vector<cv::Point2f> &q);
-
 // Checks if a quadrilateral is self-intersecting
 
 bool crossSelf(const std::vector<cv::Point2f> &q);
@@ -21,7 +18,7 @@ bool crossSelf(const std::vector<cv::Point2f> &q);
 // Clips a point to be within image boundaries
 void clipPt(cv::Point2f &p, int W, int H);
 
-// Order rectangle points clock wise (tl, tr, br, bl)
+// Order quad points clock wise (tl, tr, br, bl)
 std::vector<cv::Point2f> orderPoints(const std::vector<cv::Point2f>& pts);
 
 // Four points warping to achieve final scan of the document

@@ -74,7 +74,7 @@ std::vector<Point2f> readGtFromCoordinatesFile(const fs::path& coordFile, const 
         }
     }
     
-    orderCCW(v);
+    v = orderPoints(v);
     return v;
 }
 
@@ -106,6 +106,6 @@ std::vector<Point2f> readGt(const fs::path& t) {
         }
     }
     
-    orderCCW(v);
+    v = orderPoints(v);
     return v;
 }

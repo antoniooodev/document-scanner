@@ -35,7 +35,7 @@ std::vector<Point2f> detect(const Mat &img)
         if (ap.size() == 4 && cv::isContourConvex(ap))
         {
             std::vector<Point2f> q(ap.begin(), ap.end());
-            orderCCW(q);
+            q = orderPoints(q);
             evalQuad(q, list, Aimg, W, H, eq, gray, medGrad);
         }
     }
@@ -47,7 +47,7 @@ std::vector<Point2f> detect(const Mat &img)
         Point2f r[4];
         rr.points(r);
         std::vector<Point2f> q(r, r + 4);
-        orderCCW(q);
+        q = orderPoints(q);
         evalQuad(q, list, Aimg, W, H, eq, gray, medGrad);
     }
 
@@ -71,7 +71,7 @@ std::vector<Point2f> detect(const Mat &img)
         Point2f r[4];
         rr.points(r);
         best.assign(r, r + 4);
-        orderCCW(best);
+        best = orderPoints(best);
     }
 
     // Refine ±2 px if border safe

@@ -105,7 +105,7 @@ static double exec(const fs::path& imgP, const fs::path& gtP, const fs::path& co
     if (!gt.empty()) {
         // Re-order ground truth vector clock wise (for correct corner corrispondence)
         gt = orderPoints(gt);
-        double avgDist = averagePointDistance(quad, gt);
+        avgDist = averagePointDistance(quad, gt);
         std::cout << "--> Average distance from ground truth: " << avgDist << " pixels\n";
     }
 
