@@ -1,14 +1,13 @@
 # Document Scanner
 
 An optimized C++ document scanner using OpenCV that automatically detects document boundaries in images and provides perspective correction.
+The final results for performance metrics are saved in complete_results.txt in the output folder.
 
 ## Project Structure
 
 ```
 DocumentScanner/
 ├── CMakeLists.txt          # Main build configuration
-├── build.sh               # Build script
-├── run_tests.sh           # Test runner script
 ├── include/               # Header files
 │   ├── geometry_utils.h
 │   ├── image_preprocessing.h
