@@ -1,0 +1,78 @@
+# Build directories
+build/
+Build/
+BUILD/
+
+# CMake generated files
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+*.cmake
+!CMakeLists.txt
+
+# Compiled binaries
+*.exe
+*.out
+DocumentScanner
+test_*
+
+# Object files
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.dll
+*.dylib
+
+# IDE files
+.vscode/
+.idea/
+*.vcxproj*
+*.sln
+*.sdf
+*.opensdf
+*.suo
+
+# Visual Studio
+Debug/
+Release/
+x64/
+Win32/
+*.user
+*.pdb
+*.ilk
+*.log
+
+# Xcode
+*.xcodeproj/
+*.xcworkspace/
+
+# Qt Creator
+*.pro.user*
+
+# Data files (keep structure, ignore content)
+data/input/*
+!data/input/.gitkeep
+data/output/*
+!data/output/.gitkeep
+
+# Temporary files
+*.tmp
+*.temp
+*~
+*.swp
+*.swo
+
+# OS specific
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+ehthumbs.db
+
+# Logs and dumps
+*.log
+core
+core.*
