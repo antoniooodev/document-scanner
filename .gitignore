@@ -75,4 +75,4 @@ ehthumbs.db
 # Logs and dumps
 *.log
 core
-core.*
+core.**.gch
