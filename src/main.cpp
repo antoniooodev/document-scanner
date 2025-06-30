@@ -1,8 +1,4 @@
-/* ----------------------------------------------------------------
- *  main.cpp   —  DocumentScanner entry point  (per‑image + mean logging)
- *  Uses orderPoints() for vertex ordering and appends a MEAN line
- *  to complete_results.txt in dataset mode.
- * ----------------------------------------------------------------*/
+// src/main.cpp
 #include "document_detector.h"
 #include "file_io.h"
 #include "evaluation.h"
