@@ -6,9 +6,7 @@ An optimized C++ document scanner using OpenCV that automatically detects docume
 
 ```
 DocumentScanner/
-├── CMakeLists.txt          # Main build configuration
-├── build.sh                # Build script
-├── run_tests.sh            # Test runner script
+├── CMakeLists.txt          # Main build configuration         
 ├── include/                # Header files
 │   ├── geometry_utils.h
 │   ├── image_preprocessing.h
