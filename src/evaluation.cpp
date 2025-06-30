@@ -38,6 +38,7 @@ double averagePointDistance(const std::vector<cv::Point2f>& a, const std::vector
     
     double totalDist = 0.0;
     for (size_t i = 0; i < a.size(); ++i) {
+        // Distance along x and y
         double dx = a[i].x - b[i].x;
         double dy = a[i].y - b[i].y;
         // Euclidean distance between the two points

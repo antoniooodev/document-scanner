@@ -1,3 +1,4 @@
+// src/file_io.cpp
 #include "file_io.h"
 #include "geometry_utils.h"
 #include <opencv2/opencv.hpp>
@@ -7,6 +8,7 @@
 using cv::Point2f;
 using cv::Mat;
 
+// Saves a quad to a text file
 void saveTxt(const fs::path& p, const std::vector<Point2f>& q) {
     std::ofstream f(p);
     f << "(" << (int)q[0].x << "," << (int)q[0].y << "),("
@@ -15,6 +17,7 @@ void saveTxt(const fs::path& p, const std::vector<Point2f>& q) {
       << (int)q[3].x << "," << (int)q[3].y << ")\n";
 }
 
+// Extract four points corresponding to given image name
 std::vector<Point2f> readGtFromCoordinatesFile(const fs::path& coordFile, const std::string& imageName) {
     std::vector<Point2f> v;
     std::ifstream f(coordFile);
@@ -25,6 +28,7 @@ std::vector<Point2f> readGtFromCoordinatesFile(const fs::path& coordFile, const 
     }
     
     std::string line;
+    // "Img_12:" format
     std::string targetPrefix = imageName + ":";
     
     while(std::getline(f, line)) {
@@ -35,12 +39,14 @@ std::vector<Point2f> readGtFromCoordinatesFile(const fs::path& coordFile, const 
             size_t pos = line.find(':');
             if(pos == std::string::npos) continue;
             
+            // Extract part after :
             std::string coords = line.substr(pos + 1);
             
             // Extract coordinates from quoted strings
             std::vector<std::pair<float, float>> points;
             size_t start = 0;
             
+            // Look for quoted pairs "x y"
             while((start = coords.find('"', start)) != std::string::npos) {
                 size_t end = coords.find('"', start + 1);
                 if(end == std::string::npos) break;
@@ -54,14 +60,18 @@ std::vector<Point2f> readGtFromCoordinatesFile(const fs::path& coordFile, const 
                     points.emplace_back(x, y);
                 }
                 
+                // Continue parsing
                 start = end + 1;
             }
             
+            // If 4 points found, convert pairs into Point2f
             if(points.size() == 4) {
                 for(const auto& p : points) {
                     v.emplace_back(p.first, p.second);
                 }
             }
+
+            // Stop once relevant line has been parsed
             break;
         }
     }
@@ -78,6 +88,7 @@ std::vector<Point2f> readGtFromCoordinatesFile(const fs::path& coordFile, const 
     return v;
 }
 
+// For annotated data
 std::vector<Point2f> readGt(const fs::path& t) {
     std::vector<Point2f> v;
     std::ifstream f(t);
@@ -89,6 +100,7 @@ std::vector<Point2f> readGt(const fs::path& t) {
     
     char c;
     while(f >> c) {
+        // Skip opening '('
         if(c != '(') continue;
         float x, y;
         char comma;
@@ -98,6 +110,7 @@ std::vector<Point2f> readGt(const fs::path& t) {
         }
     }
     
+    // Check if four points were found
     if(v.size() != 4) {
         std::cerr << "Warning: Expected 4 points in ground truth, got " << v.size() << std::endl;
         if(v.empty()) {
@@ -106,6 +119,7 @@ std::vector<Point2f> readGt(const fs::path& t) {
         }
     }
     
+    // Order for consistency (still CCW)
     v = orderPoints(v);
     return v;
 }

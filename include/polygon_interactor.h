@@ -23,19 +23,20 @@ public:
     std::vector<cv::Point2f> editedQuad() const;
 
 private:
-    // ---------- helper methods ----------
+    // helper methods
     void drawOverlay();
-    int  hitTest(const cv::Point2f& p) const;          // returns vertex index or -1
+    // returns vertex index or -1
+    int  hitTest(const cv::Point2f& p) const;
     static void onMouse(int event, int x, int y, int flags, void* userdata);
 
-    // ---------- data members ------------
+    // data members
     cv::Mat                 original_;    // original image
     cv::Mat                 display_;     // image with overlay
-    std::vector<cv::Point2f> quad_;       // editable quad (size == 4)
+    std::vector<cv::Point2f> quad_;       // editable quad (size 4)
     int                     activeIdx_;   // index of vertex being dragged, -1 else
     double                  eps2_;        // squared hit radius (epsilon^2)
     std::string             outDir_;      // where to save the scan
 };
 
-#endif /* POLYGON_INTERACTOR_H_ */
+#endif // POLYGON_INTERACTOR_H_
 

@@ -4,10 +4,10 @@
 
 #include <opencv2/opencv.hpp>
 
-// Image preprocessing functions for edge detection and enhancement.
+// Image preprocessing functions for edge detection and enhancement
 
-// Preprocesses image and returns median gradient value.
-// Applies CLAHE, Sobel operators, thresholding, and morphological operations.
+// Preprocesses image and returns median gradient value
+// Applies CLAHE, Sobel operators, thresholding, and morphological operations
 
 double preprocessImage(const cv::Mat &img, cv::Mat &mag, cv::Mat &eq);
 

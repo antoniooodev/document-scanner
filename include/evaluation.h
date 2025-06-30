@@ -8,9 +8,9 @@
 using cv::Mat;
 using cv::Point2f;
 
-// Evaluation metrics for document detection accuracy.
+// Evaluation metrics for document detection accuracy
 
-// Calculates Intersection over Union (IoU) between two quadrilaterals.
+// Calculates Intersection over Union (IoU) between two quadrilaterals
 double IoU(std::vector<cv::Point2f> a, std::vector<cv::Point2f> b);
 
 // Computes average distance between detected corners and true corners

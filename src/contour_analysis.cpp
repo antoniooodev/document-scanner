@@ -9,27 +9,32 @@ using cv::Point2f;
 double edgeMean(const std::vector<Point2f> &q, const Mat &eq)
 {
     Mat sob;
-    // Emphasizes gradient edges using Sobel
+    // Emphasizes gradient edges using Sobel (over and y)
     cv::Sobel(eq, sob, CV_32F, 1, 1);
     double s = 0;
     int n = 0;
 
-    // Goes over all edge points and computes average edge strengh on quad's border
+    // Goes over all edge points (4 sides of quad) and computes average edge strengh on quad's border
     for (int i = 0; i < 4; i++)
     {
+        // Sample pixels between two points
         cv::LineIterator it(sob, q[i], q[(i + 1) & 3], 8);
         for (int j = 0; j < it.count; ++j, ++it)
         {
-            s += static_cast<double>((*it)[0]); // Uchar always positive
+            // Sum gradient magnitudes over edge
+            s += static_cast<double>((*it)[0]);
             ++n;
         }
     }
+
+    // Return average gradient strength over the quad
     return n ? s / n : 0;
 }
 
 double borderFrac(const std::vector<Point2f> &q, int W, int H)
 {
     double touch = 0, per = 0;
+
     // If both endpoints of an edge are close to the border, add its length to the total
     for (int i = 0; i < 4; i++)
     {
@@ -47,21 +52,27 @@ double borderFrac(const std::vector<Point2f> &q, int W, int H)
     return touch / per;
 }
 
+// Higher score means more contrast with background
 double whiteness(const std::vector<Point2f> &q, const Mat &gray)
 {
     std::vector<cv::Point> poly;
     for (auto &p : q)
         poly.emplace_back(p);
 
+    // Create a mask for the region inside the quad
     Mat mask = Mat::zeros(gray.size(), CV_8U);
     cv::fillConvexPoly(mask, poly, 255);
 
+    // Mean intensity inside/outside the quad
     cv::Scalar mDoc = cv::mean(gray, mask);
     cv::Scalar mBg = cv::mean(gray, 255 - mask);
 
+    // Brightness ratio
     double w = (mBg[0] > 1) ? mDoc[0] / mBg[0] : 1;
     if (w < 1)
         w = 1 / w;
+
+    // Normalize in [0,1] and threshold at 0.5
     return std::clamp((w - 1) / 0.5, 0.0, 1.0);
 }
 
@@ -83,20 +94,20 @@ void evalQuad(std::vector<Point2f> q, std::vector<Cand> &list,
         return;
 
     // Compares aspect ratio of the quad to that of a normal A4 paper
+    // Aspect ratio: Long side / Short side
     double areaFit = 1 - std::abs(A - 0.458 * Aimg) / (0.458 * Aimg);
 
     double ar = std::max(cv::norm(q[0] - q[1]), cv::norm(q[1] - q[2])) /
                 std::min(cv::norm(q[0] - q[1]), cv::norm(q[1] - q[2]));
     double ARfit = 1 - std::min(std::abs(ar - 1.414) / 1.0, 1.0);
 
-    // Comparison with median gradient in the img
+    // Comparison of quad's borders with median gradient in the img
     double gradFit = medGrad > 1 ? std::clamp(edgeMean(q, eq) / (edgeMean(q, eq) + medGrad), 0.0, 1.0) : 0.5;
 
-    // Computes whiteness of quad's content
+    // Computes whiteness score of the quad
     double wFit = whiteness(q, gray);
 
-    // Optimized weights
-    // All scores are combined into a final eval
+    // Final eval with weighted sum of the scores
     double score = 0.329 * areaFit + 0.266 * wFit + 0.208 * gradFit + 0.197 * ARfit;
 
     // Pushes quad into the candidates list if it wasn't discarded (with its score)

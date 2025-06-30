@@ -18,7 +18,7 @@ bool crossSelf(const std::vector<cv::Point2f> &q);
 // Clips a point to be within image boundaries
 void clipPt(cv::Point2f &p, int W, int H);
 
-// Order quad points clock wise (tl, tr, br, bl)
+// Order quad points counter lock wise (tl, bl, br, tr)
 void orderCCW(std::vector<cv::Point2f>& q);
 
 std::vector<cv::Point2f> orderPoints(const std::vector<cv::Point2f>& pts);
